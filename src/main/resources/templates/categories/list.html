@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Categories - Todo app</title>
+	<link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+<header class="site-header">
+	<nav aria-label="Main navigation"><a th:href="@{/}">Tasks</a> <a th:href="@{/categories}" aria-current="page">Categories</a></nav>
+</header>
+<main class="container">
+	<h1 class="page-header">Categories</h1>
+	<p class="feedback success" role="status" th:if="${successMessage}" th:text="${successMessage}"></p>
+	<p class="feedback error" role="alert" th:if="${errorMessage}" th:text="${errorMessage}"></p>
+	<section class="card" aria-labelledby="create-heading">
+		<h2 id="create-heading">Create category</h2>
+		<form class="stack" method="post" th:action="@{/categories}" th:object="${categoryForm}">
+			<p class="feedback error" role="alert" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+			<label for="name">Category name</label>
+			<input type="text" id="name" th:field="*{name}" required
+				   aria-describedby="name-help name-error" th:attr="aria-invalid=${#fields.hasErrors('name')}">
+			<p id="name-help" class="hint">Names must be unique. Uncategorized is reserved for todos without a category.</p>
+			<p id="name-error" class="field-error" role="alert" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+			<button type="submit">Create category</button>
+		</form>
+	</section>
+	<section class="card" aria-labelledby="list-heading" th:unless="${categoriesUnavailable}">
+		<h2 id="list-heading">Existing categories</h2>
+		<p class="empty-state" th:if="${#lists.isEmpty(categories)}">No categories yet. Create one above to organize your todos.</p>
+		<ul th:unless="${#lists.isEmpty(categories)}">
+			<li th:each="category : ${categories}">
+				<span th:text="${category.name}"></span>
+				<span class="actions">
+					<a th:href="@{/categories/{id}/edit(id=${category.id})}"
+					   th:attr="aria-label=|Rename ${category.name}|">Rename</a>
+					<a th:href="@{/categories/{id}/delete(id=${category.id})}"
+					   th:attr="aria-label=|Delete ${category.name}|">Delete</a>
+				</span>
+			</li>
+		</ul>
+	</section>
+</main>
+</body>
+</html>

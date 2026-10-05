@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title th:text="${todoId == null ? 'New task | Todo' : 'Edit task | Todo'}"></title>
+	<link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><nav aria-label="Main navigation"><a th:href="@{/}">Tasks</a><a th:href="@{/categories}">Categories</a></nav></header>
+<main id="main" class="container narrow">
+	<div class="page-header"><div><a th:href="@{/}">Back to tasks</a><h1 th:text="${todoId == null ? 'New task' : 'Edit task'}"></h1></div></div>
+	<p th:if="${error}" class="feedback error" role="alert" th:text="${error}"></p>
+	<form class="card stack" method="post" th:object="${todoForm}"
+			th:action="${todoId == null} ? @{/todos} : @{/todos/{id}(id=${todoId})}">
+		<div th:if="${#fields.hasErrors('*')}" class="feedback error" role="alert">
+			<p>Please review the errors below. Your entries have been preserved.</p>
+			<p th:each="message : ${#fields.globalErrors()}" th:text="${message}"></p>
+		</div>
+		<div class="field">
+			<label for="name">Name (required)</label>
+			<input id="name" type="text" th:field="*{name}" required aria-describedby="name-error"
+					th:attr="aria-invalid=${#fields.hasErrors('name')}">
+			<p id="name-error" class="field-error" th:errors="*{name}"></p>
+		</div>
+		<div class="field">
+			<label for="description">Description (optional)</label>
+			<textarea id="description" th:field="*{description}" rows="6" aria-describedby="description-help"></textarea>
+			<p id="description-help" class="hint">Plain text. Line breaks are preserved.</p>
+		</div>
+		<fieldset>
+			<legend>Due date and time (optional)</legend>
+			<p id="due-help" class="hint">Enter both fields, or clear both to remove the due time. Time zone: <strong th:text="${zone}"></strong>.</p>
+			<div class="form-grid">
+				<div class="field">
+					<label for="dueDate">Due date</label>
+					<input id="dueDate" type="date" th:field="*{dueDate}" aria-describedby="due-help dueDate-error"
+							th:attr="aria-invalid=${#fields.hasErrors('dueDate')}">
+					<p id="dueDate-error" class="field-error" th:errors="*{dueDate}"></p>
+					<p th:if="${#fields.hasErrors('dueDate')}" class="hint">Entered date: <span th:text="*{dueDate}"></span></p>
+				</div>
+				<div class="field">
+					<label for="dueTime">Due time</label>
+					<input id="dueTime" type="time" step="any" th:field="*{dueTime}" aria-describedby="due-help dueTime-error"
+							th:attr="aria-invalid=${#fields.hasErrors('dueTime')}">
+					<p id="dueTime-error" class="field-error" th:errors="*{dueTime}"></p>
+					<p th:if="${#fields.hasErrors('dueTime')}" class="hint">Entered time: <span th:text="*{dueTime}"></span></p>
+				</div>
+			</div>
+		</fieldset>
+		<div class="field">
+			<label for="categoryId">Category (optional)</label>
+			<select id="categoryId" th:field="*{categoryId}" aria-describedby="category-help categoryId-error"
+					th:attr="aria-invalid=${#fields.hasErrors('categoryId')}">
+				<option value="">Uncategorized</option>
+				<option th:if="${unavailableCategory and todoForm.categoryId != null and !todoForm.categoryId.isBlank()}"
+						th:value="*{categoryId}" th:text="${'Unavailable selection: ' + todoForm.categoryId}"></option>
+				<option th:each="option : ${categories}" th:value="${option.id}" th:text="${option.name}"></option>
+			</select>
+			<p id="categoryId-error" class="field-error" th:errors="*{categoryId}"></p>
+			<p id="category-help" class="hint">
+				<span th:if="${categoriesAvailable and categories.isEmpty()}">No categories yet. You can save this task as Uncategorized. </span>
+				<a th:href="@{/categories}">Manage categories</a>
+			</p>
+		</div>
+		<div class="actions"><button type="submit" th:text="${todoId == null ? 'Create task' : 'Save changes'}"></button><a th:href="@{/}">Cancel</a></div>
+	</form>
+</main>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Tasks | Todo</title>
+	<link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+	<nav aria-label="Main navigation"><a th:href="@{/}" aria-current="page">Tasks</a><a th:href="@{/categories}">Categories</a></nav>
+</header>
+<main id="main" class="container">
+	<div class="page-header">
+		<div><p class="eyebrow">One thing at a time</p><h1>Your tasks</h1><p class="hint">Make room for what matters.</p></div>
+		<a class="button" th:href="@{/todos/new}">New task</a>
+	</div>
+	<p th:if="${success}" class="feedback success" role="status" th:text="${success}"></p>
+	<form class="card filters" method="get" th:action="@{/}">
+		<div class="field"><label for="completion">Status</label>
+			<select id="completion" name="completion">
+				<option value="all" th:selected="${completion == 'all'}">All tasks</option>
+				<option value="active" th:selected="${completion == 'active'}">Active</option>
+				<option value="completed" th:selected="${completion == 'completed'}">Completed</option>
+			</select>
+		</div>
+		<div class="field"><label for="category">Category</label>
+			<select id="category" name="category">
+				<option value="all" th:selected="${category == 'all'}">All categories</option>
+				<option value="uncategorized" th:selected="${category == 'uncategorized'}">Uncategorized</option>
+				<option th:each="option : ${categories}" th:value="${option.id}" th:text="${option.name}"
+						th:selected="${category == option.id.toString()}"></option>
+			</select>
+		</div>
+		<div class="actions"><button type="submit" class="secondary">Apply filters</button><a th:if="${filtered}" th:href="@{/}">Clear filters</a></div>
+	</form>
+	<div th:if="${rows.isEmpty()}" class="card empty-state">
+		<h2 th:text="${filtered ? 'No matching tasks' : 'A fresh start'}"></h2>
+		<p th:text="${filtered ? 'Try another status or category, or clear the filters.' : 'No tasks yet. Create your first task with just a name.'}"></p>
+		<a th:href="@{/todos/new}">Create a task</a>
+	</div>
+	<ul th:unless="${rows.isEmpty()}" class="task-list" aria-label="Tasks">
+		<li th:each="row : ${rows}" class="card task" th:classappend="${row.todo.completed ? 'completed' : ''}">
+			<div class="task-content">
+				<h2><a th:href="@{/todos/{id}/edit(id=${row.todo.id})}" th:text="${row.todo.name}"></a></h2>
+				<div class="task-meta">
+					<span class="badge" th:text="${row.todo.completed ? 'Completed' : 'Active'}"></span>
+					<span th:if="${row.overdue}" class="badge overdue">Overdue</span>
+					<span th:text="${row.categoryName}"></span>
+				</div>
+				<p class="due" th:if="${row.todo.dueAt != null}">Due <time th:datetime="${row.todo.dueAt}" th:text="${row.dueLabel}"></time></p>
+				<p class="hint due" th:unless="${row.todo.dueAt != null}">No due date</p>
+			</div>
+			<div class="actions">
+				<form method="post" th:action="@{/todos/{id}/completion(id=${row.todo.id})}">
+					<input type="hidden" name="completed" th:value="${!row.todo.completed}">
+					<button type="submit" class="secondary" th:text="${row.todo.completed ? 'Reopen' : 'Complete'}"
+							th:attr="aria-label=${(row.todo.completed ? 'Reopen ' : 'Complete ') + row.todo.name}"></button>
+				</form>
+				<a th:href="@{/todos/{id}/edit(id=${row.todo.id})}" th:attr="aria-label=${'Edit ' + row.todo.name}">Edit</a>
+				<a class="danger-link" th:href="@{/todos/{id}/delete(id=${row.todo.id})}" th:attr="aria-label=${'Delete ' + row.todo.name}">Delete</a>
+			</div>
+		</li>
+	</ul>
+</main>
+</body>
+</html>
