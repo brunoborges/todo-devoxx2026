@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Category unavailable - Todo app</title>
+	<link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+<header class="site-header">
+	<nav aria-label="Main navigation"><a th:href="@{/}">Tasks</a> <a th:href="@{/categories}">Categories</a></nav>
+</header>
+<main class="container">
+	<h1 class="page-header">Category unavailable</h1>
+	<p class="feedback error" role="alert" th:text="${errorMessage}"></p>
+	<div class="actions"><a th:href="@{/categories}">Back to categories</a> <a th:href="@{/}">Back to todos</a></div>
+</main>
+</body>
+</html>

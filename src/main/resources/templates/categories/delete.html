@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Delete category - Todo app</title>
+	<link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+<header class="site-header">
+	<nav aria-label="Main navigation"><a th:href="@{/}">Tasks</a> <a th:href="@{/categories}">Categories</a></nav>
+</header>
+<main class="container">
+	<h1 class="page-header">Delete category</h1>
+	<p>Delete <strong th:text="${category.name}"></strong>?</p>
+	<p>Associated todos: <strong th:text="${todoCount}"></strong>.</p>
+	<p>All associated todos will be kept and become uncategorized. Only this category will be deleted.</p>
+	<p class="feedback error" role="alert" th:if="${errorMessage}" th:text="${errorMessage}"></p>
+	<form class="card stack" method="post" th:action="@{/categories/{id}/delete(id=${category.id})}">
+		<div>
+			<input type="checkbox" id="confirm" name="confirm" value="true" required>
+			<label for="confirm">I confirm that I want to delete this category.</label>
+		</div>
+		<div class="actions"><button class="button danger" type="submit">Delete category</button> <a th:href="@{/categories}">Cancel</a></div>
+	</form>
+</main>
+</body>
+</html>
